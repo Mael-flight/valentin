@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Une surprise pour toi... ❤️</title>
+    <style>
+        :root {
+            --pink-bg: #fff0f3;
+            --main-pink: #ff4d6d;
+            --dark-pink: #c9184a;
+            --soft-white: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--pink-bg);
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Animation des coeurs en arrière-plan */
+        .heart {
+            position: fixed;
+            top: -10%;
+            font-size: 20px;
+            color: var(--main-pink);
+            user-select: none;
+            z-index: -1;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* La carte centrale */
+        .container {
+            background: var(--soft-white);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.2);
+            text-align: center;
+            max-width: 450px;
+            width: 85%;
+            z-index: 10;
+        }
+
+        h1 {
+            color: var(--dark-pink);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .buttons-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            min-height: 250px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #btn-yes {
+            background-color: var(--main-pink);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+            z-index: 5;
+        }
+
+        #btn-no {
+            background-color: #e0e0e0;
+            color: #666;
+        }
+
+        .hidden { display: none; }
+
+        .emoji-big { font-size: 4rem; display: block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-card">
+        <div id="quiz-section">
+            <h1 id="question-text">Veux-tu être ma Valentine ? 💖</h1>
+            <div class="buttons-wrapper">
+                <button id="btn-yes">Oui, bien sûr !</button>
+                <button id="btn-no">Non</button>
+            </div>
+        </div>
+
+        <div id="success-message" class="hidden">
+            <h1>Merci beaucoup ! 😍</h1>
+            <p>Tu viens de me rendre la personne la plus heureuse !</p>
+            <span class="emoji-big">💖🌹🍭</span>
+        </div>
+
+        <div id="sad-message" class="hidden">
+            <h1>Ok, pas grave 😢</h1>
+            <p>Je garderai quand même un bon souvenir...</p>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION : COLLE TON LIEN DISCORD CI-DESSOUS
+        const DISCORD_WEBHOOK_URL = "TON_LIEN_WEBHOOK_ICI"; 
+
+        const btnYes = document.getElementById('btn-yes');
+        const btnNo = document.getElementById('btn-no');
+        const quizSection = document.getElementById('quiz-section');
+        const successMsg = document.getElementById('success-message');
+        const sadMsg = document.getElementById('sad-message');
+
+        let clickCount = 0;
+        let yesScale = 1;
+        let noScale = 1;
+
+        const phrases = [
+            "Es-tu sûre ?",
+            "Vraiment vraiment sûre ?",
+            "Réfléchis encore un tout petit peu...",
+            "S'il te plaît ? 🥺",
+            "Tu vas me briser le coeur... 💔",
+            "Dernière chance !",
+        ];
+
+        // Fonction pour envoyer à Discord
+        function notifyDiscord(answer) {
+            if(DISCORD_WEBHOOK_URL === "https://discord.com/api/webhooks/1469444021763178620/4Vf6qAALlGBFI7tdNnB89XSitozazqgBshwv3zENgC9NDqmi6tRiLQEYgrfvS40xC6N2") return;
+            
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    content: `🔔 **Alerte Cupidon !** \nLa réponse est : **${answer}**`
+                })
+            });
+        }
+
+        // Animation des coeurs
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = ['❤️','💖','💝','🌸'][Math.floor(Math.random()*4)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+        setInterval(createHeart, 400);
+
+        // Clic sur NON
+        btnNo.addEventListener('click', () => {
+            if (clickCount < phrases.length) {
+                btnNo.innerText = phrases[clickCount];
+                
+                // Le OUI grossit
+                yesScale += 0.5;
+                btnYes.style.transform = `scale(${yesScale})`;
+                
+                // Le NON rétrécit
+                noScale -= 0.15;
+                btnNo.style.transform = `scale(${noScale})`;
+                
+                clickCount++;
+            } else {
+                // Échec final
+                quizSection.classList.add('hidden');
+                sadMsg.classList.remove('hidden');
+                notifyDiscord("NON (Elle a dit non jusqu'au bout 😢)");
+            }
+        });
+
+        // Clic sur OUI
+        btnYes.addEventListener('click', () => {
+            quizSection.classList.add('hidden');
+            successMsg.classList.remove('hidden');
+            setInterval(createHeart, 50); // Explosion de coeurs
+            notifyDiscord("OUI ! 😍 (Félicitations !)");
+        });
+    </script>
+</body>
+</html>
