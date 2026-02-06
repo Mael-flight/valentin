@@ -117,84 +117,78 @@
     </div>
 
     <script>
-        // CONFIGURATION : COLLE TON LIEN DISCORD CI-DESSOUS
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1469444021763178620/4Vf6qAALlGBFI7tdNnB89XSitozazqgBshwv3zENgC9NDqmi6tRiLQEYgrfvS40xC6N2"; 
+    // CONFIGURATION : TON LIEN DISCORD
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1469444021763178620/4Vf6qAALlGBFI7tdNnB89XSitozazqgBshwv3zENgC9NDqmi6tRiLQEYgrfvS40xC6N2"; 
 
-        const btnYes = document.getElementById('btn-yes');
-        const btnNo = document.getElementById('btn-no');
-        const quizSection = document.getElementById('quiz-section');
-        const successMsg = document.getElementById('success-message');
-        const sadMsg = document.getElementById('sad-message');
+    const btnYes = document.getElementById('btn-yes');
+    const btnNo = document.getElementById('btn-no');
+    const quizSection = document.getElementById('quiz-section');
+    const successMsg = document.getElementById('success-message');
+    const sadMsg = document.getElementById('sad-message');
 
-        let clickCount = 0;
-        let yesScale = 1;
-        let noScale = 1;
+    let clickCount = 0;
+    let yesScale = 1;
+    let noScale = 1;
 
-        const phrases = [
-            "Es-tu sûre ?",
-            "Vraiment vraiment sûre ?",
-            "Réfléchis encore un tout petit peu...",
-            "S'il te plaît ? 🥺",
-            "Tu vas me briser le coeur... 💔",
-            "Dernière chance !",
-        ];
+    const phrases = [
+        "Es-tu sûre ?",
+        "Vraiment vraiment sûre ?",
+        "Réfléchis encore un tout petit peu...",
+        "S'il te plaît ? 🥺",
+        "Tu vas me briser le coeur... 💔",
+        "Dernière chance !",
+    ];
 
-        // Fonction pour envoyer à Discord
-        function notifyDiscord(answer) {
-            if(DISCORD_WEBHOOK_URL === "https://discord.com/api/webhooks/1469444021763178620/4Vf6qAALlGBFI7tdNnB89XSitozazqgBshwv3zENgC9NDqmi6tRiLQEYgrfvS40xC6N2") return;
-            
-            fetch(DISCORD_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    content: `🔔 **Alerte Cupidon !** \nLa réponse est : **${answer}**`
-                })
-            });
-        }
+    // Fonction pour envoyer à Discord (CORRIGÉE)
+    function notifyDiscord(answer) {
+        // On a enlevé la ligne "if(...) return" qui bloquait l'envoi
+        fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: `🔔 **Alerte Cupidon !** \nLa réponse est : **${answer}**`
+            })
+        }).catch(err => console.error("Erreur d'envoi :", err));
+    }
 
-        // Animation des coeurs
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart');
-            heart.innerHTML = ['❤️','💖','💝','🌸'][Math.floor(Math.random()*4)];
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 5000);
-        }
-        setInterval(createHeart, 400);
+    // Animation des coeurs
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = ['❤️','💖','💝','🌸'][Math.floor(Math.random()*4)];
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+    }
+    setInterval(createHeart, 400);
 
-        // Clic sur NON
-        btnNo.addEventListener('click', () => {
-            if (clickCount < phrases.length) {
-                btnNo.innerText = phrases[clickCount];
-                
-                // Le OUI grossit
-                yesScale += 0.5;
-                btnYes.style.transform = `scale(${yesScale})`;
-                
-                // Le NON rétrécit
-                noScale -= 0.15;
-                btnNo.style.transform = `scale(${noScale})`;
-                
-                clickCount++;
-            } else {
-                // Échec final
-                quizSection.classList.add('hidden');
-                sadMsg.classList.remove('hidden');
-                notifyDiscord("NON (Elle a dit non jusqu'au bout 😢)");
-            }
-        });
-
-        // Clic sur OUI
-        btnYes.addEventListener('click', () => {
+    // Clic sur NON
+    btnNo.addEventListener('click', () => {
+        if (clickCount < phrases.length) {
+            btnNo.innerText = phrases[clickCount];
+            yesScale += 0.5;
+            btnYes.style.transform = `scale(${yesScale})`;
+            noScale -= 0.15;
+            btnNo.style.transform = `scale(${noScale})`;
+            clickCount++;
+        } else {
             quizSection.classList.add('hidden');
-            successMsg.classList.remove('hidden');
-            setInterval(createHeart, 50); // Explosion de coeurs
-            notifyDiscord("OUI ! 😍 (Félicitations !)");
-        });
-    </script>
+            sadMsg.classList.remove('hidden');
+            notifyDiscord("NON (Elle a dit non jusqu'au bout 😢)");
+        }
+    });
+
+    // Clic sur OUI
+    btnYes.addEventListener('click', () => {
+        quizSection.classList.add('hidden');
+        successMsg.classList.remove('hidden');
+        setInterval(createHeart, 50); 
+        notifyDiscord("OUI ! 😍 (Félicitations !)");
+    });
+</script>
 </body>
 
 </html>
+
 
